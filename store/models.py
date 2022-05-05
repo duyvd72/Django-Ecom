@@ -57,8 +57,8 @@ class Variation(models.Model):
 
     objects = VariationManager()
 
-    def __unicode__(self):
-        return self.item
+    def __str__(self):
+        return self.variation_value
 
 
 class LaptopItem(Item):

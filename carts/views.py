@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from carts.models import Cart, CartItem
-from store.models import Item
+from store.models import Item, Variation
 
 
 def _cart_id(request):
@@ -13,12 +13,19 @@ def _cart_id(request):
 
 
 def add_cart(request, item_id):
-    color = request.GET['color']
-    size = request.GET['size']
-    return HttpResponse(color + ' ' + size)
-    exit()
-
     item = Item.objects.get(id=item_id)
+    item_variation = []
+    if request.method == 'POST':
+        for product in request.POST:
+            key = product
+            value = request.POST[key]
+
+            try:
+                variation = Variation.objects.get(item=item, variation_category__iexact=key, variation_value__iexact=value)
+                item_variation.append(variation)
+            except:
+                pass
+
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))
     except Cart.DoesNotExist:
@@ -29,6 +36,10 @@ def add_cart(request, item_id):
 
     try:
         cart_item = CartItem.objects.get(item=item, cart=cart)
+        if len(item_variation) > 0:
+            cart_item.variations.clear()
+            for product in item_variation:
+                cart_item.variations.add(product)
         cart_item.quantity += 1
         cart_item.save()
     except CartItem.DoesNotExist:
@@ -37,6 +48,10 @@ def add_cart(request, item_id):
             quantity = 1,
             cart = cart,
         )
+        if len(item_variation) > 0:
+            cart_item.variations.clear()
+            for product in item_variation:
+                cart_item.variations.add(product)
         cart.save()
     return redirect('cart')
 
