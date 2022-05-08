@@ -64,14 +64,11 @@ class Variation(models.Model):
 class LaptopItem(Item):
     version = models.CharField(max_length=255)
     cpu = models.CharField(max_length=255)
-    ram = models.CharField(max_length=255)
     color = models.CharField(max_length=255)
     laptop = models.ForeignKey(Laptop, on_delete=models.CASCADE)
 
 
 class ClothesItem(Item):
-    size = models.CharField(max_length=255)
-    color = models.CharField(max_length=255)
     clothes = models.ForeignKey(Clothes, on_delete=models.CASCADE)
 
 
@@ -79,7 +76,6 @@ class MobilePhoneItem(Item):
     chip = models.CharField(max_length=255)
     ram = models.CharField(max_length=255)
     internal_memory = models.CharField(max_length=255, null=True)
-    color = models.CharField(max_length=255)
     mobile_phone = models.ForeignKey(MobilePhone, on_delete=models.CASCADE)
 
 
