@@ -26,6 +26,7 @@
                             </div>
                             <p>{{ single_item.description }}</p>
                             <hr>
+                            {% if single_item.item_type.name == 'Clothes' %}
                             <div class="row">
                                 <div class="item-option-select">
                                     <h6>Select Color</h6>
@@ -49,6 +50,36 @@
                                 </div>
                             </div> <!-- row.// -->
                             <hr>
+                            {% endif %}
+
+                            {% if single_item.item_type.name == 'Laptop' %}
+                            <div class="row">
+                                <div class="item-option-select">
+                                    <h6>Select Ram</h6>
+                                    	<select name="color" class="form-control" required>
+                                            <option value="" disabled selected>Select</option>
+                                            {% for i in single_item.variation_set.colors %}
+											<option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+                                            {% endfor %}
+										</select>
+                                </div>
+                            </div> <!-- row.// -->
+                            {% endif %}
+
+                            {% if single_item.item_type.name == 'Mobile Phone' %}
+                            <div class="row">
+                                <div class="item-option-select">
+                                    <h6>Select Color</h6>
+                                    	<select name="color" class="form-control" required>
+                                            <option value="" disabled selected>Select</option>
+                                            {% for i in single_item.variation_set.colors %}
+											<option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+                                            {% endfor %}
+										</select>
+                                </div>
+                            </div> <!-- row.// -->
+                            {% endif %}
+
                             {% if single_item.stock <= 0 %}
                             <h5 class="text-danger">Out Of Stock</h5>
                             {% else %}
