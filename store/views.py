@@ -1,9 +1,11 @@
 from django.db.models import Q
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from carts.models import CartItem
 from carts.views import _cart_id
-from store.models import Item, ItemType
+from store.forms import ReviewForm
+from store.models import Item, ItemType, ReviewRating
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.contrib import messages
 
 
 def store(request, item_type_slug=None):
@@ -49,10 +51,34 @@ def search(request):
     if 'keyword' in request.GET:
         keyword = request.GET['keyword']
         if keyword:
-            items = Item.objects.filter(Q(description__icontains=keyword) |  Q(item_name__icontains=keyword))
+            items = Item.objects.filter(Q(description__icontains=keyword) | Q(item_name__icontains=keyword))
             item_count = items.count()
     context = {
         'items': items,
         'item_count': item_count,
     }
     return render(request, 'store/store.html', context)
+
+
+def submit_review(request, item_id):
+    url = request.META.get('HTTP_REFERER')
+    if request.method == 'POST':
+        try:
+            reviews = ReviewRating.objects.get(user__id=request.user.id, item__id=item_id)
+            form = ReviewForm(request.POST, instance=reviews)
+            form.save()
+            messages.success(request, 'Thank you! Your review has been updated.')
+            return redirect(url)
+        except ReviewRating.DoesNotExist:
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                data = ReviewRating()
+                data.subject = form.cleaned_data['subject']
+                data.rating = form.cleaned_data['rating']
+                data.review = form.cleaned_data['review']
+                data.ip = request.META.get('REMOTE_ADDR')
+                data.item_id = item_id
+                data.user_id = request.user.id
+                data.save()
+                messages.success(request, 'Thank you! Your review has been submitted.')
+                return redirect(url)
